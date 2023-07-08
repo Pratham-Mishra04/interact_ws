@@ -1,11 +1,13 @@
 package ws
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -38,11 +40,56 @@ func NewManager() *Manager {
 
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventSendMessage] = SendMessage
+	m.handlers[EventChangeChat] = ChatRoomHandler
+}
+
+func ChatRoomHandler(event Event, c *Client) error {
+	var changeChatEvent ChangeChatEvent
+
+	if err := json.Unmarshal(event.Payload, &changeChatEvent); err != nil {
+		return fmt.Errorf("Bad Payload :%v", err)
+	}
+
+	c.chatID = changeChatEvent.ID
+
+	return nil
 }
 
 func SendMessage(event Event, c *Client) error {
-	fmt.Println(event)
+	var chatEvent SendMessageEvent
+
+	if err := json.Unmarshal(event.Payload, &chatEvent); err != nil {
+		return fmt.Errorf("Bad Payload :%v", err)
+	}
+
+	var broadMessage NewMessageEvent
+
+	broadMessage.CreatedAt = time.Now()
+	broadMessage.Content = chatEvent.Content
+	broadMessage.UserID = chatEvent.UserID
+	broadMessage.User = chatEvent.User
+	broadMessage.ChatID = chatEvent.ChatID
+	broadMessage.Read = false
+
+	data, err := json.Marshal(broadMessage)
+
+	if err != nil {
+		return fmt.Errorf("Failed to Marshall BroadCast Message")
+	}
+
+	outgoingEvent := Event{
+		Type:    EventNewMessage,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if client.chatID == broadMessage.ChatID {
+			client.egress <- outgoingEvent
+		}
+	}
+
 	return nil
+
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) error {
@@ -66,7 +113,12 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := NewClient(conn, m)
+	params := r.URL.Query()
+	chatID := params.Get("chatID")
+
+	log.Print(chatID)
+
+	client := NewClient(conn, m, chatID)
 
 	m.addClient(client)
 

@@ -18,15 +18,17 @@ type ClientList map[*Client]bool
 type Client struct {
 	connection *websocket.Conn
 	manager    *Manager
+	chatID     string
 
 	// egress is used to avoid concurrent writes of the websocket connection, unbuffered channel
 	egress chan Event
 }
 
-func NewClient(conn *websocket.Conn, manager *Manager) *Client {
+func NewClient(conn *websocket.Conn, manager *Manager, chatID string) *Client {
 	return &Client{
 		connection: conn,
 		manager:    manager,
+		chatID:     chatID,
 		egress:     make(chan Event),
 	}
 }
@@ -100,7 +102,6 @@ func (c *Client) writeMessages() {
 			}
 
 		case <-ticker.C:
-			log.Println("ping")
 			if err := c.connection.WriteMessage(websocket.PingMessage, []byte(``)); err != nil {
 				log.Println("Ticker Write Message Error: ", err)
 				return
@@ -110,6 +111,5 @@ func (c *Client) writeMessages() {
 }
 
 func (c *Client) pongHandler(pongMsg string) error {
-	log.Println("pong")
 	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
 }
