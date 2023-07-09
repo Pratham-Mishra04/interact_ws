@@ -16,6 +16,10 @@ const (
 	EventSendMessage = "send_message"
 	EventNewMessage  = "new_message"
 	EventChangeChat  = "change_chat"
+	MeTyping         = "me_typing"
+	MeStopTyping     = "me_stop_typing"
+	UserTyping       = "user_typing"
+	UserStopTyping   = "user_stop_typing"
 )
 
 type UserType struct {
@@ -58,4 +62,21 @@ type NewMessageEvent struct {
 
 type ChangeChatEvent struct {
 	ID string `json:"id"`
+}
+
+type MeTypingEvent struct {
+	User   UserType `json:"user"`
+	ChatID string   `json:"chatID"`
+}
+
+type MeStopTypingEvent struct {
+	MeTypingEvent
+}
+
+type UserTypingEvent struct {
+	MeTypingEvent
+}
+
+type UserStopTypingEvent struct {
+	MeTypingEvent
 }

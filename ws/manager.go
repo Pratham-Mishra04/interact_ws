@@ -41,6 +41,74 @@ func NewManager() *Manager {
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventSendMessage] = SendMessage
 	m.handlers[EventChangeChat] = ChatRoomHandler
+	m.handlers[MeTyping] = MeTypingHandler
+	m.handlers[MeStopTyping] = MeStopTypingHandler
+}
+
+func MeStopTypingHandler(event Event, c *Client) error {
+	var meStopTypingEvent MeStopTypingEvent
+
+	if err := json.Unmarshal(event.Payload, &meStopTypingEvent); err != nil {
+		return fmt.Errorf("Bad Payload :%v", err)
+	}
+
+	var userStopTyping UserStopTypingEvent
+
+	userStopTyping.User = meStopTypingEvent.User
+	userStopTyping.ChatID = meStopTypingEvent.ChatID
+
+	data, err := json.Marshal(userStopTyping)
+
+	if err != nil {
+		return fmt.Errorf("Failed to Marshall User Stop Typing Message")
+	}
+
+	outgoingEvent := Event{
+		Type:    UserStopTyping,
+		Payload: data,
+	}
+
+	log.Printf("Sending Stop Typing Payload")
+
+	for client := range c.manager.clients {
+		if client.chatID == userStopTyping.ChatID {
+			client.egress <- outgoingEvent
+		}
+	}
+
+	return nil
+}
+
+func MeTypingHandler(event Event, c *Client) error {
+	var meTypingEvent MeTypingEvent
+
+	if err := json.Unmarshal(event.Payload, &meTypingEvent); err != nil {
+		return fmt.Errorf("Bad Payload :%v", err)
+	}
+
+	var userTyping UserTypingEvent
+
+	userTyping.User = meTypingEvent.User
+	userTyping.ChatID = meTypingEvent.ChatID
+
+	data, err := json.Marshal(userTyping)
+
+	if err != nil {
+		return fmt.Errorf("Failed to Marshall User Typing Message")
+	}
+
+	outgoingEvent := Event{
+		Type:    UserTyping,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if client.chatID == userTyping.ChatID {
+			client.egress <- outgoingEvent
+		}
+	}
+
+	return nil
 }
 
 func ChatRoomHandler(event Event, c *Client) error {
@@ -115,8 +183,6 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 
 	params := r.URL.Query()
 	chatID := params.Get("chatID")
-
-	log.Print(chatID)
 
 	client := NewClient(conn, m, chatID)
 
