@@ -5,17 +5,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-
-	"github.com/Pratham-Mishra04/interactWS/initializers"
-	"github.com/gorilla/websocket"
-)
-
-var (
-	websocketUpgrader = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-		CheckOrigin:     checkOrigin,
-	}
 )
 
 type Manager struct {
@@ -91,18 +80,5 @@ func (m *Manager) removeClient(client *Client) {
 	if _, ok := m.clients[client]; ok {
 		client.connection.Close()
 		delete(m.clients, client)
-	}
-}
-
-func checkOrigin(r *http.Request) bool {
-	origin := r.Header.Get("Origin")
-
-	switch origin {
-	case initializers.CONFIG.FRONTEND_URL:
-		return true
-	case initializers.CONFIG.DEV_URL:
-		return initializers.CONFIG.ENV == "dev"
-	default:
-		return false
 	}
 }
