@@ -20,7 +20,7 @@ type Client struct {
 	manager    *Manager
 	chatID     string
 
-	// egress is used to avoid concurrent writes of the websocket connection, unbuffered channel
+	// egress is used to avoid concurrent writes of the websocket connection, unBuffered channel
 	egress chan Event
 }
 
@@ -35,7 +35,6 @@ func NewClient(conn *websocket.Conn, manager *Manager, chatID string) *Client {
 
 func (c *Client) readMessages() {
 	defer func() {
-		// remove the client and stop the loop
 		c.manager.removeClient(c)
 	}()
 
@@ -73,7 +72,6 @@ func (c *Client) readMessages() {
 
 func (c *Client) writeMessages() {
 	defer func() {
-		// remove the client and stop the loop
 		c.manager.removeClient(c)
 	}()
 
@@ -97,8 +95,6 @@ func (c *Client) writeMessages() {
 
 			if err := c.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Println("Failed to send message: ", err)
-			} else {
-				log.Printf("Message Sent.")
 			}
 
 		case <-ticker.C:

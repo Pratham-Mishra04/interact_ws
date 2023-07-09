@@ -7,7 +7,7 @@ import (
 
 type Event struct {
 	Type    string          `json:"type"`
-	Payload json.RawMessage `json:"payload"` // No type, will accept anything send from the frontend
+	Payload json.RawMessage `json:"payload"` // Will accept anything send from the frontend
 }
 
 type EventHandler func(event Event, c *Client) error
