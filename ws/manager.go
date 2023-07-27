@@ -2,9 +2,10 @@ package ws
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"sync"
+
+	"github.com/Pratham-Mishra04/interactWS/helpers"
 )
 
 type Manager struct {
@@ -39,17 +40,14 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 		}
 		return nil
 	} else {
-		return errors.New("No such Event Type present.")
+		return errors.New("invalid event requested")
 	}
 }
 
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
-
-	log.Println("Connected to WS")
-
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatal(err)
+		helpers.LogFatal("Error upgrading the connection. ", err)
 		return
 	}
 
@@ -62,8 +60,6 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 
 	go client.readMessages()
 	go client.writeMessages()
-
-	// conn.Close()
 }
 
 func (m *Manager) addClient(client *Client) {

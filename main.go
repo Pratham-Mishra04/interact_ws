@@ -11,9 +11,11 @@ import (
 
 func init() {
 	initializers.LoadEnv()
+	initializers.AddLogger()
 }
 
 func main() {
+	defer initializers.LoggerCleanUp()
 	setupAPI()
 
 	fmt.Println("Running the Server on PORT " + initializers.CONFIG.PORT)

@@ -10,7 +10,7 @@ func SendMessageHandler(event Event, c *Client) error {
 	var chatEvent SendMessageEvent
 
 	if err := json.Unmarshal(event.Payload, &chatEvent); err != nil {
-		return fmt.Errorf("Bad Payload :%v", err)
+		return fmt.Errorf("bad payload in send message handler :%v", err)
 	}
 
 	var broadMessage NewMessageEvent
@@ -25,7 +25,7 @@ func SendMessageHandler(event Event, c *Client) error {
 	data, err := json.Marshal(broadMessage)
 
 	if err != nil {
-		return fmt.Errorf("Failed to Marshall BroadCast Message")
+		return fmt.Errorf("failed to marshall broadcast message")
 	}
 
 	outgoingEvent := Event{
@@ -47,7 +47,7 @@ func ChatRoomHandler(event Event, c *Client) error {
 	var changeChatEvent ChangeChatEvent
 
 	if err := json.Unmarshal(event.Payload, &changeChatEvent); err != nil {
-		return fmt.Errorf("Bad Payload :%v", err)
+		return fmt.Errorf("bad payload in chat room handle :%v", err)
 	}
 
 	c.chatID = changeChatEvent.ID
@@ -59,7 +59,7 @@ func MeTypingHandler(event Event, c *Client) error {
 	var meTypingEvent MeTypingEvent
 
 	if err := json.Unmarshal(event.Payload, &meTypingEvent); err != nil {
-		return fmt.Errorf("Bad Payload :%v", err)
+		return fmt.Errorf("bad payload in me typing :%v", err)
 	}
 
 	var userTyping UserTypingEvent
@@ -70,7 +70,7 @@ func MeTypingHandler(event Event, c *Client) error {
 	data, err := json.Marshal(userTyping)
 
 	if err != nil {
-		return fmt.Errorf("Failed to Marshall User Typing Message")
+		return fmt.Errorf("failed to marshall user typing message")
 	}
 
 	outgoingEvent := Event{
@@ -91,7 +91,7 @@ func MeStopTypingHandler(event Event, c *Client) error {
 	var meStopTypingEvent MeStopTypingEvent
 
 	if err := json.Unmarshal(event.Payload, &meStopTypingEvent); err != nil {
-		return fmt.Errorf("Bad Payload :%v", err)
+		return fmt.Errorf("bad payload in me stop typing :%v", err)
 	}
 
 	var userStopTyping UserStopTypingEvent
@@ -102,7 +102,7 @@ func MeStopTypingHandler(event Event, c *Client) error {
 	data, err := json.Marshal(userStopTyping)
 
 	if err != nil {
-		return fmt.Errorf("Failed to Marshall User Stop Typing Message")
+		return fmt.Errorf("failed to marshall user stop typing message")
 	}
 
 	outgoingEvent := Event{
