@@ -13,13 +13,16 @@ type Event struct {
 type EventHandler func(event Event, c *Client) error
 
 const (
-	EventSendMessage = "send_message"
-	EventNewMessage  = "new_message"
-	EventChangeChat  = "change_chat"
-	MeTyping         = "me_typing"
-	MeStopTyping     = "me_stop_typing"
-	UserTyping       = "user_typing"
-	UserStopTyping   = "user_stop_typing"
+	ChatSetup                = "chat_setup"
+	EventSendMessage         = "send_message"
+	EventNewMessage          = "new_message"
+	EventSendNotification    = "send_notification"
+	EventReceiveNotification = "receive_notification"
+	EventChangeChat          = "change_chat"
+	MeTyping                 = "me_typing"
+	MeStopTyping             = "me_stop_typing"
+	UserTyping               = "user_typing"
+	UserStopTyping           = "user_stop_typing"
 )
 
 type UserType struct {
@@ -47,6 +50,9 @@ type UserType struct {
 	Tags              []string  `json:"tags"`
 }
 
+type ChatSetupEvent struct {
+	Chats []string `json:"chats"`
+}
 type SendMessageEvent struct {
 	Content string   `json:"content"`
 	ChatID  string   `json:"chatID"`
@@ -79,4 +85,9 @@ type UserTypingEvent struct {
 
 type UserStopTypingEvent struct {
 	MeTypingEvent
+}
+
+type NotificationEvent struct {
+	UserID  string `json:"userID"`
+	Content string `json:"content"`
 }

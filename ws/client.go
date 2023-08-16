@@ -19,15 +19,16 @@ type ClientList map[*Client]bool
 type Client struct {
 	connection *websocket.Conn
 	manager    *Manager
-	chatID     string
+	userID     string
+	chats      []string
 	egress     chan Event
 }
 
-func NewClient(conn *websocket.Conn, manager *Manager, chatID string) *Client {
+func NewClient(conn *websocket.Conn, manager *Manager, userID string) *Client {
 	return &Client{
 		connection: conn,
 		manager:    manager,
-		chatID:     chatID,
+		userID:     userID,
 		egress:     make(chan Event),
 	}
 }

@@ -2,6 +2,7 @@ package ws
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -17,8 +18,7 @@ type Manager struct {
 
 func NewManager() *Manager {
 	m := &Manager{
-		clients: make(ClientList),
-
+		clients:  make(ClientList),
 		handlers: make(map[string]EventHandler),
 	}
 
@@ -28,9 +28,11 @@ func NewManager() *Manager {
 
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventSendMessage] = SendMessageHandler
-	m.handlers[EventChangeChat] = ChatRoomHandler
+	// m.handlers[EventChangeChat] = ChatRoomHandler
 	m.handlers[MeTyping] = MeTypingHandler
 	m.handlers[MeStopTyping] = MeStopTypingHandler
+	m.handlers[ChatSetup] = ChatSetupHandler
+	m.handlers[EventSendNotification] = NotificationHandler
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) error {
@@ -47,16 +49,18 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		helpers.LogFatal("Error upgrading the connection. ", err)
+		helpers.LogError("Error upgrading the connection. ", err)
 		return
 	}
 
 	params := r.URL.Query()
-	chatID := params.Get("chatID")
+	userID := params.Get("userID")
 
-	client := NewClient(conn, m, chatID)
+	client := NewClient(conn, m, userID)
 
 	m.addClient(client)
+
+	fmt.Println("New Connect established for user: " + userID)
 
 	go client.readMessages()
 	go client.writeMessages()

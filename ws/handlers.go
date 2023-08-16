@@ -4,7 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/Pratham-Mishra04/interactWS/utils"
 )
+
+func ChatSetupHandler(event Event, c *Client) error {
+	var setupEvent ChatSetupEvent
+
+	if err := json.Unmarshal(event.Payload, &setupEvent); err != nil {
+		return fmt.Errorf("bad payload in chat setup handler :%v", err)
+	}
+
+	c.chats = setupEvent.Chats
+	fmt.Println("Chats setup for user: " + c.userID)
+	return nil
+}
 
 func SendMessageHandler(event Event, c *Client) error {
 	var chatEvent SendMessageEvent
@@ -34,26 +48,57 @@ func SendMessageHandler(event Event, c *Client) error {
 	}
 
 	for client := range c.manager.clients {
-		if client.chatID == broadMessage.ChatID {
+		if utils.Includes(client.chats, broadMessage.ChatID) {
 			client.egress <- outgoingEvent
 		}
 	}
 
 	return nil
-
 }
 
-func ChatRoomHandler(event Event, c *Client) error {
-	var changeChatEvent ChangeChatEvent
+func NotificationHandler(event Event, c *Client) error {
+	var notificationEvent NotificationEvent
 
-	if err := json.Unmarshal(event.Payload, &changeChatEvent); err != nil {
-		return fmt.Errorf("bad payload in chat room handle :%v", err)
+	if err := json.Unmarshal(event.Payload, &notificationEvent); err != nil {
+		return fmt.Errorf("bad payload in send notification handler :%v", err)
 	}
 
-	c.chatID = changeChatEvent.ID
+	var sendNotification NotificationEvent
+
+	sendNotification.UserID = notificationEvent.UserID
+	sendNotification.Content = notificationEvent.Content
+
+	data, err := json.Marshal(sendNotification)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshall send notification")
+	}
+
+	outgoingEvent := Event{
+		Type:    EventReceiveNotification,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if client.userID == sendNotification.UserID {
+			client.egress <- outgoingEvent
+		}
+	}
 
 	return nil
 }
+
+// func ChatRoomHandler(event Event, c *Client) error {
+// 	var changeChatEvent ChangeChatEvent
+
+// 	if err := json.Unmarshal(event.Payload, &changeChatEvent); err != nil {
+// 		return fmt.Errorf("bad payload in chat room handle :%v", err)
+// 	}
+
+// 	c.chatID = changeChatEvent.ID
+
+// 	return nil
+// }
 
 func MeTypingHandler(event Event, c *Client) error {
 	var meTypingEvent MeTypingEvent
@@ -79,7 +124,7 @@ func MeTypingHandler(event Event, c *Client) error {
 	}
 
 	for client := range c.manager.clients {
-		if client.chatID == userTyping.ChatID {
+		if utils.Includes(client.chats, userTyping.ChatID) {
 			client.egress <- outgoingEvent
 		}
 	}
@@ -111,7 +156,7 @@ func MeStopTypingHandler(event Event, c *Client) error {
 	}
 
 	for client := range c.manager.clients {
-		if client.chatID == userStopTyping.ChatID {
+		if utils.Includes(client.chats, userStopTyping.ChatID) {
 			client.egress <- outgoingEvent
 		}
 	}
