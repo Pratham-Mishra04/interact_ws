@@ -8,11 +8,18 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Environment string
+
+const (
+	DevelopmentEnv Environment = "development"
+	ProductionEnv  Environment = "production"
+)
+
 type Config struct {
-	PORT         string `mapstructure:"PORT"`
-	DEV_URL      string `mapstructure:"DEV_URL"`
-	FRONTEND_URL string `mapstructure:"FRONTEND_URL"`
-	ENV          string `mapstructure:"ENV"`
+	PORT         string      `mapstructure:"PORT"`
+	DEV_URL      string      `mapstructure:"DEV_URL"`
+	FRONTEND_URL string      `mapstructure:"FRONTEND_URL"`
+	ENV          Environment `mapstructure:"ENV"`
 }
 
 var CONFIG Config
@@ -35,6 +42,11 @@ func LoadEnv() {
 
 	if len(missingKeys) > 0 {
 		err := fmt.Errorf("following environment variables not found: %v", missingKeys)
+		log.Fatal(err)
+	}
+
+	if CONFIG.ENV != DevelopmentEnv && CONFIG.ENV != ProductionEnv {
+		err := fmt.Errorf("invalid ENV value: %s", CONFIG.ENV)
 		log.Fatal(err)
 	}
 }

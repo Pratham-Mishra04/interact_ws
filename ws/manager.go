@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/Pratham-Mishra04/interactWS/helpers"
+	"github.com/Pratham-Mishra04/interactWS/initializers"
 )
 
 type Manager struct {
@@ -60,7 +61,9 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 
 	m.addClient(client)
 
-	fmt.Println("New Connect established for user: " + userID)
+	if initializers.CONFIG.ENV == initializers.DevelopmentEnv {
+		fmt.Println("New Connect established for user: " + userID)
+	}
 
 	go client.readMessages()
 	go client.writeMessages()
