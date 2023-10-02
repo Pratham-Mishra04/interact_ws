@@ -18,6 +18,8 @@ const (
 	EventNewMessage          = "new_message"
 	EventSendNotification    = "send_notification"
 	EventReceiveNotification = "receive_notification"
+	GetRead                  = "send_read_message"
+	UpdateRead               = "read_message"
 	EventChangeChat          = "change_chat"
 	MeTyping                 = "me_typing"
 	MeStopTyping             = "me_stop_typing"
@@ -90,4 +92,16 @@ type UserStopTypingEvent struct {
 type NotificationEvent struct {
 	UserID  string `json:"userID"`
 	Content string `json:"content"`
+}
+
+type ReadEvent struct {
+	UserID    string `json:"userID"`
+	MessageID string `json:"messageID"`
+	ChatID    string `json:"chatID"`
+}
+
+type UpdateReadEvent struct {
+	UserID    string `json:"userID"`
+	MessageID string `json:"id"`
+	ChatID    string `json:"chatID"`
 }

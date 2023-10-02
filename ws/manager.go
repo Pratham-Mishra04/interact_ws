@@ -34,6 +34,7 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[MeStopTyping] = MeStopTypingHandler
 	m.handlers[ChatSetup] = ChatSetupHandler
 	m.handlers[EventSendNotification] = NotificationHandler
+	m.handlers[GetRead] = ReadMessageHandler
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) error {

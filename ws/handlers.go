@@ -56,6 +56,41 @@ func SendMessageHandler(event Event, c *Client) error {
 	return nil
 }
 
+func ReadMessageHandler(event Event, c *Client) error {
+	var readEvent ReadEvent
+
+	if err := json.Unmarshal(event.Payload, &readEvent); err != nil {
+		return fmt.Errorf("bad payload in send message handler :%v", err)
+	}
+
+	fmt.Println("In Read Message Handler")
+
+	var broadMessage UpdateReadEvent
+
+	broadMessage.MessageID = readEvent.MessageID
+	broadMessage.UserID = readEvent.UserID
+	broadMessage.ChatID = readEvent.ChatID
+
+	data, err := json.Marshal(broadMessage)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshall broadcast message")
+	}
+
+	outgoingEvent := Event{
+		Type:    UpdateRead,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if utils.Includes(client.chats, broadMessage.ChatID) {
+			client.egress <- outgoingEvent
+		}
+	}
+
+	return nil
+}
+
 func NotificationHandler(event Event, c *Client) error {
 	var notificationEvent NotificationEvent
 
