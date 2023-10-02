@@ -56,6 +56,7 @@ type ChatSetupEvent struct {
 	Chats []string `json:"chats"`
 }
 type SendMessageEvent struct {
+	ID      string   `json:"id"`
 	Content string   `json:"content"`
 	ChatID  string   `json:"chatID"`
 	User    UserType `json:"user"`

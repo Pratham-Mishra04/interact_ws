@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Pratham-Mishra04/interactWS/utils"
+	"github.com/google/uuid"
 )
 
 func ChatSetupHandler(event Event, c *Client) error {
@@ -29,6 +30,7 @@ func SendMessageHandler(event Event, c *Client) error {
 
 	var broadMessage NewMessageEvent
 
+	broadMessage.ID = uuid.New().String()
 	broadMessage.CreatedAt = time.Now()
 	broadMessage.Content = chatEvent.Content
 	broadMessage.UserID = chatEvent.UserID
@@ -62,8 +64,6 @@ func ReadMessageHandler(event Event, c *Client) error {
 	if err := json.Unmarshal(event.Payload, &readEvent); err != nil {
 		return fmt.Errorf("bad payload in send message handler :%v", err)
 	}
-
-	fmt.Println("In Read Message Handler")
 
 	var broadMessage UpdateReadEvent
 
