@@ -20,6 +20,7 @@ type Config struct {
 	DEV_URL      string      `mapstructure:"DEV_URL"`
 	FRONTEND_URL string      `mapstructure:"FRONTEND_URL"`
 	ENV          Environment `mapstructure:"ENV"`
+	JWT_SECRET   string      `mapstructure:"JWT_SECRET"`
 }
 
 var CONFIG Config
