@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  frontend:
+  ws:
     container_name: interact-ws
     build:
       context: .
