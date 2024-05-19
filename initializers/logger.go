@@ -3,6 +3,7 @@ package initializers
 import (
 	"log"
 	"os"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -44,6 +45,7 @@ func AddLogger() {
 
 func newCore(LogFile *os.File, LoggerLevel zapcore.Level) zapcore.Core {
 	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC1123)
 	fileCore := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderCfg),
 		zapcore.AddSync(LogFile),
