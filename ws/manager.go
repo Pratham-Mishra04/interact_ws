@@ -106,7 +106,7 @@ func verifyToken(tokenString string, userID string) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("token has expired")
+		return err
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

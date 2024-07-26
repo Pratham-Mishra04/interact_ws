@@ -3,6 +3,7 @@ package helpers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 
 func LogInfo(customString string, path string) {
 	initializers.Logger.Info(customString, "Path", path)
-	LogToAdminLogger(customString, "warn", nil, path)
+	LogToAdminLogger(customString, "info", nil, path)
 }
 
 func LogWarn(customString string, err error, path string) {
@@ -26,7 +27,7 @@ func LogError(customString string, err error, path string) {
 }
 
 func LogFatal(customString string, err error, path string) {
-	initializers.Logger.Infow(customString, "Path", path, "Error", err)
+	initializers.Logger.Errorw(customString, "Path", path, "Error", err)
 	LogToAdminLogger(customString, "fatal", err, path)
 }
 
@@ -54,6 +55,10 @@ func createAdminJWT() (string, error) {
 }
 
 func LogToAdminLogger(customString string, level string, err error, path string) {
+	if err == nil {
+		err = fmt.Errorf("no error description provided")
+	}
+
 	logEntry := LogEntrySchema{
 		Level:       level,
 		Title:       customString,
