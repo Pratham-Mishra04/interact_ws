@@ -198,3 +198,36 @@ func MeStopTypingHandler(event Event, c *Client) error {
 
 	return nil
 }
+
+func UpdateMembershipHandler(event Event, c *Client) error {
+	var updateMembershipEvent UpdateMembership
+
+	if err := json.Unmarshal(event.Payload, &updateMembershipEvent); err != nil {
+		return fmt.Errorf("bad payload in update membership :%v", err)
+	}
+
+	var updateMembership UpdateMembership
+
+	updateMembership.UserID = updateMembershipEvent.UserID
+	updateMembership.OrganizationID = updateMembershipEvent.OrganizationID
+	updateMembership.Role = updateMembershipEvent.Role
+
+	data, err := json.Marshal(updateMembership)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshall update membership")
+	}
+
+	outgoingEvent := Event{
+		Type:    CatchUpdateMembershipEvent,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if client.userID == updateMembership.UserID {
+			client.egress <- outgoingEvent
+		}
+	}
+
+	return nil
+}

@@ -37,6 +37,7 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[ChatSetup] = ChatSetupHandler
 	m.handlers[EventSendNotification] = NotificationHandler
 	m.handlers[GetRead] = ReadMessageHandler
+	m.handlers[SendUpdateMembershipEvent] = UpdateMembershipHandler
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) error {
