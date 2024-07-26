@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Pratham-Mishra04/interactWS/initializers"
 	"github.com/Pratham-Mishra04/interactWS/utils"
-	"github.com/google/uuid"
 )
 
 func ChatSetupHandler(event Event, c *Client) error {
@@ -17,7 +17,9 @@ func ChatSetupHandler(event Event, c *Client) error {
 	}
 
 	c.chats = setupEvent.Chats
-	fmt.Println("Chats setup for user: " + c.userID)
+	if initializers.CONFIG.ENV == initializers.DevelopmentEnv {
+		fmt.Println("Chats setup for user: " + c.userID)
+	}
 	return nil
 }
 
@@ -30,7 +32,7 @@ func SendMessageHandler(event Event, c *Client) error {
 
 	var broadMessage NewMessageEvent
 
-	broadMessage.ID = uuid.New().String()
+	broadMessage.ID = chatEvent.ID
 	broadMessage.CreatedAt = time.Now()
 	broadMessage.Content = chatEvent.Content
 	broadMessage.UserID = chatEvent.UserID
@@ -68,7 +70,7 @@ func ReadMessageHandler(event Event, c *Client) error {
 	var broadMessage UpdateReadEvent
 
 	broadMessage.MessageID = readEvent.MessageID
-	broadMessage.UserID = readEvent.UserID
+	broadMessage.User = readEvent.User
 	broadMessage.ChatID = readEvent.ChatID
 
 	data, err := json.Marshal(broadMessage)

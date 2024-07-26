@@ -96,13 +96,13 @@ type NotificationEvent struct {
 }
 
 type ReadEvent struct {
-	UserID    string `json:"userID"`
-	MessageID string `json:"messageID"`
-	ChatID    string `json:"chatID"`
+	User      UserType `json:"user"`
+	MessageID string   `json:"messageID"`
+	ChatID    string   `json:"chatID"`
 }
 
 type UpdateReadEvent struct {
-	UserID    string `json:"userID"`
-	MessageID string `json:"id"`
-	ChatID    string `json:"chatID"`
+	User      UserType `json:"user"`
+	MessageID string   `json:"messageID"`
+	ChatID    string   `json:"chatID"`
 }

@@ -43,16 +43,17 @@ func (c *Client) readMessages() {
 		return
 	}
 
-	c.connection.SetReadLimit(1024)
+	c.connection.SetReadLimit(10240) //10 KB
 
 	c.connection.SetPongHandler(c.pongHandler)
 
 	for {
 		_, payload, err := c.connection.ReadMessage()
-
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				helpers.LogError("Error reading a message, abnormal connection closure", err, "readMessages")
+			} else {
+				helpers.LogError("Error reading a message", err, "readMessages")
 			}
 			break
 		}
@@ -73,6 +74,7 @@ func (c *Client) readMessages() {
 func (c *Client) writeMessages() {
 	defer func() {
 		c.manager.removeClient(c)
+		_ = c.connection.Close()
 	}()
 
 	ticker := time.NewTicker(pingInterval)
@@ -80,7 +82,7 @@ func (c *Client) writeMessages() {
 	for {
 		select {
 		case message, ok := <-c.egress:
-			if !ok { // Some error with the channel
+			if !ok { // Channel closed, meaning the connection should be closed
 				if err := c.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
 					helpers.LogError("Error writing a message, abnormal connection closure", err, "readMessages")
 				}
@@ -95,6 +97,7 @@ func (c *Client) writeMessages() {
 
 			if err := c.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				helpers.LogError("Error sending messages", err, "readMessages")
+				return
 			}
 
 		case <-ticker.C:
