@@ -221,7 +221,7 @@ func UpdateMembershipHandler(event Event, c *Client) error {
 	}
 
 	outgoingEvent := Event{
-		Type:    CatchUpdateMembershipEvent,
+		Type:    ReceiveUpdateMembershipEvent,
 		Payload: data,
 	}
 

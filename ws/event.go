@@ -26,7 +26,7 @@ const (
 	UserTyping               = "user_typing"
 	UserStopTyping           = "user_stop_typing"
 	SendUpdateMembershipEvent    = "send_update_membership"
-	CatchUpdateMembershipEvent    = "catch_update_membership"
+	ReceiveUpdateMembershipEvent    = "receive_update_membership"
 )
 
 type UserType struct {
