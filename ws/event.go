@@ -25,6 +25,8 @@ const (
 	MeStopTyping             = "me_stop_typing"
 	UserTyping               = "user_typing"
 	UserStopTyping           = "user_stop_typing"
+	SendUpdateMembershipEvent    = "send_update_membership"
+	ReceiveUpdateMembershipEvent    = "receive_update_membership"
 )
 
 type UserType struct {
@@ -105,4 +107,10 @@ type UpdateReadEvent struct {
 	User      UserType `json:"user"`
 	MessageID string   `json:"messageID"`
 	ChatID    string   `json:"chatID"`
+}
+
+type UpdateMembership struct {
+	UserID    	   string `json:"userID"`
+	OrganizationID string `json:"organizationID"`
+	Role           string `json:"role"`
 }
