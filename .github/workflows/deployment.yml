@@ -1,0 +1,27 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Stash Changes
+        run: git stash
+        working-directory: /home/prathammishra/interact/interact_ws
+
+      - name: Pull Changes
+        run: git pull origin main
+        working-directory: /home/prathammishra/interact/interact_ws
+
+      - name: Build and Deploy
+        run: |
+          sudo docker compose up --build -d
+        working-directory: /home/prathammishra/interact/interact_ws
