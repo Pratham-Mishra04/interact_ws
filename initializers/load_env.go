@@ -21,7 +21,7 @@ type Config struct {
 	FRONTEND_URL  string      `mapstructure:"FRONTEND_URL"`
 	ENV           Environment `mapstructure:"ENV"`
 	JWT_SECRET    string      `mapstructure:"JWT_SECRET"`
-	BASE_URL      string      `mapstructure:"BASE_URL"`
+	SOCKETS_URL      string      `mapstructure:"SOCKETS_URL"`
 	LOGGER_URL    string      `mapstructure:"LOGGER_URL"`
 	LOGGER_SECRET string      `mapstructure:"LOGGER_SECRET"`
 	LOGGER_TOKEN  string      `mapstructure:"LOGGER_TOKEN"`

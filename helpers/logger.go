@@ -87,7 +87,7 @@ func LogToAdminLogger(customString string, level string, err error, path string)
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+jwt)
 	request.Header.Set("api-token", initializers.CONFIG.LOGGER_TOKEN)
-	request.Header.Set("Origin", initializers.CONFIG.BASE_URL)
+	request.Header.Set("Origin", initializers.CONFIG.SOCKETS_URL)
 
 	client := http.DefaultClient
 	response, err := client.Do(request)
