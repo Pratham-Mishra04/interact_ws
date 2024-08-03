@@ -109,6 +109,7 @@ func (c *Client) writeMessages() {
 					if !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 						helpers.LogWarn("Ticker Write Message Error", err, "writeMessages")
 					}
+					return
 				}
 			}
 		}
