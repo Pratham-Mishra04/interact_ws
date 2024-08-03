@@ -52,21 +52,20 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 }
 
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
-	conn, err := websocketUpgrader.Upgrade(w, r, nil)
-	if err != nil {
-		helpers.LogError("Error upgrading the connection. ", err, "ServeWS")
-		return
-	}
-
 	params := r.URL.Query()
 	userID := params.Get("userID")
 	token := params.Get("token")
 
 	if err := verifyToken(token, userID); err != nil {
-		helpers.LogWarn("Token verification failed: ", err, "ServeWS")
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Unauthorized: Token verification failed"))
 	} else {
+		conn, err := websocketUpgrader.Upgrade(w, r, nil)
+		if err != nil {
+			helpers.LogError("Error upgrading the connection. ", err, "ServeWS")
+			return
+		}
+
 		client := NewClient(conn, m, userID)
 
 		m.addClient(client)

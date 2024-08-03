@@ -78,13 +78,16 @@ func (c *Client) writeMessages() {
 	}()
 
 	ticker := time.NewTicker(pingInterval)
+	defer ticker.Stop()
 
 	for {
 		select {
 		case message, ok := <-c.egress:
 			if !ok { // Channel closed, meaning the connection should be closed
 				if err := c.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
-					helpers.LogError("Error writing a message, abnormal connection closure", err, "readMessages")
+					if !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+						helpers.LogError("Error writing close message", err, "writeMessages")
+					}
 				}
 				return
 			}
@@ -101,9 +104,12 @@ func (c *Client) writeMessages() {
 			}
 
 		case <-ticker.C:
-			if err := c.connection.WriteMessage(websocket.PingMessage, []byte(``)); err != nil {
-				helpers.LogWarn("Ticker Write Message Error", err, "readMessages")
-				return
+			if c.connection != nil {
+				if err := c.connection.WriteMessage(websocket.PingMessage, []byte(``)); err != nil {
+					if !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+						helpers.LogWarn("Ticker Write Message Error", err, "writeMessages")
+					}
+				}
 			}
 		}
 	}
