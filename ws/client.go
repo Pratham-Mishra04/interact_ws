@@ -36,6 +36,7 @@ func NewClient(conn *websocket.Conn, manager *Manager, userID string) *Client {
 func (c *Client) readMessages() {
 	defer func() {
 		c.manager.removeClient(c)
+		_ = c.connection.Close()
 	}()
 
 	if err := c.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
@@ -50,9 +51,7 @@ func (c *Client) readMessages() {
 	for {
 		_, payload, err := c.connection.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				helpers.LogError("Error reading a message, abnormal connection closure", err, "readMessages")
-			} else {
+			if !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				helpers.LogError("Error reading a message", err, "readMessages")
 			}
 			break
@@ -106,7 +105,7 @@ func (c *Client) writeMessages() {
 		case <-ticker.C:
 			if c.connection != nil {
 				if err := c.connection.WriteMessage(websocket.PingMessage, []byte(``)); err != nil {
-					if !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+					if !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) && err != websocket.ErrCloseSent {
 						helpers.LogWarn("Ticker Write Message Error", err, "writeMessages")
 					}
 					return
