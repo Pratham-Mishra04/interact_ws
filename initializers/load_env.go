@@ -16,15 +16,16 @@ const (
 )
 
 type Config struct {
-	PORT          string      `mapstructure:"PORT"`
-	DEV_URL       string      `mapstructure:"DEV_URL"`
-	FRONTEND_URL  string      `mapstructure:"FRONTEND_URL"`
-	ENV           Environment `mapstructure:"ENV"`
-	JWT_SECRET    string      `mapstructure:"JWT_SECRET"`
-	SOCKETS_URL      string      `mapstructure:"SOCKETS_URL"`
-	LOGGER_URL    string      `mapstructure:"LOGGER_URL"`
-	LOGGER_SECRET string      `mapstructure:"LOGGER_SECRET"`
-	LOGGER_TOKEN  string      `mapstructure:"LOGGER_TOKEN"`
+	PORT           string      `mapstructure:"PORT"`
+	DEV_URL        string      `mapstructure:"DEV_URL"`
+	FRONTEND_URL   string      `mapstructure:"FRONTEND_URL"`
+	HACKATHONS_URL string      `mapstructure:"HACKATHONS_URL"`
+	ENV            Environment `mapstructure:"ENV"`
+	JWT_SECRET     string      `mapstructure:"JWT_SECRET"`
+	SOCKETS_URL    string      `mapstructure:"SOCKETS_URL"`
+	LOGGER_URL     string      `mapstructure:"LOGGER_URL"`
+	LOGGER_SECRET  string      `mapstructure:"LOGGER_SECRET"`
+	LOGGER_TOKEN   string      `mapstructure:"LOGGER_TOKEN"`
 }
 
 var CONFIG Config

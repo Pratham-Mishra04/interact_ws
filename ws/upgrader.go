@@ -22,6 +22,8 @@ func checkOrigin(r *http.Request) bool {
 	switch origin {
 	case initializers.CONFIG.FRONTEND_URL:
 		return true
+	case initializers.CONFIG.HACKATHONS_URL:
+		return true
 	case initializers.CONFIG.DEV_URL:
 		return initializers.CONFIG.ENV == "development"
 	default:
