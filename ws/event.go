@@ -13,20 +13,25 @@ type Event struct {
 type EventHandler func(event Event, c *Client) error
 
 const (
-	ChatSetup                = "chat_setup"
-	EventSendMessage         = "send_message"
-	EventNewMessage          = "new_message"
-	EventSendNotification    = "send_notification"
-	EventReceiveNotification = "receive_notification"
-	GetRead                  = "send_read_message"
-	UpdateRead               = "read_message"
-	EventChangeChat          = "change_chat"
-	MeTyping                 = "me_typing"
-	MeStopTyping             = "me_stop_typing"
-	UserTyping               = "user_typing"
-	UserStopTyping           = "user_stop_typing"
+	ChatSetup                    = "chat_setup"
+	EventSendMessage             = "send_message"
+	EventNewMessage              = "new_message"
+	EventSendNotification        = "send_notification"
+	EventReceiveNotification     = "receive_notification"
+	GetRead                      = "send_read_message"
+	UpdateRead                   = "read_message"
+	EventChangeChat              = "change_chat"
+	MeTyping                     = "me_typing"
+	MeStopTyping                 = "me_stop_typing"
+	UserTyping                   = "user_typing"
+	UserStopTyping               = "user_stop_typing"
 	SendUpdateMembershipEvent    = "send_update_membership"
-	ReceiveUpdateMembershipEvent    = "receive_update_membership"
+	ReceiveUpdateMembershipEvent = "receive_update_membership"
+	HackathonSetup               = "hackathon_setup"
+	HackathonUpdateSendEvent     = "send_hackathon_update"
+	HackathonUpdateReceiveEvent  = "receive_hackathon_update"
+	SendHackathonAnnouncement    = "send_new_hackathon_announcement"
+	ReceiveHackathonAnnouncement = "receive_new_hackathon_announcement"
 )
 
 type UserType struct {
@@ -54,9 +59,36 @@ type UserType struct {
 	Tags              []string  `json:"tags"`
 }
 
+type HackathonType struct {
+	ID                      string    `json:"id"`
+	OrganizationID          string    `json:"organizationID"`
+	MinTeamSize             int8      `json:"minTeamSize"`
+	MaxTeamSize             int8      `json:"maxTeamSize"`
+	TeamFormationStartTime  time.Time `json:"teamFormationStartTime"`
+	TeamFormationEndTime    time.Time `json:"teamFormationEndTime"`
+	StartTime               time.Time `json:"startTime"`
+	EndTime                 time.Time `json:"endTime"`
+	IsEnded                 bool      `json:"isEnded"`
+	AllowEditDuringJudging  bool      `json:"allowEditDuringJudging"`
+	EnableGithubIntegration bool      `json:"enableGithubIntegration"`
+	EnableFigmaIntegration  bool      `json:"enableFigmaIntegration"`
+	EnableAutoCodeReviews   bool      `json:"enableAutoCodeReviews"`
+	MakeProjectsPublic      bool      `json:"makeProjectsPublic"`
+}
+
+type AnnouncementType struct {
+	ID             string    `json:"id"`
+	HackathonID    string    `json:"hackathonID"`
+	OrganizationID string    `json:"organizationID"`
+	Title          string    `json:"title"`
+	Content        string    `json:"content"`
+	CreatedAt      time.Time `json:"createdAt"`
+}
+
 type ChatSetupEvent struct {
 	Chats []string `json:"chats"`
 }
+
 type SendMessageEvent struct {
 	ID      string   `json:"id"`
 	Content string   `json:"content"`
@@ -110,7 +142,15 @@ type UpdateReadEvent struct {
 }
 
 type UpdateMembership struct {
-	UserID    	   string `json:"userID"`
+	UserID         string `json:"userID"`
 	OrganizationID string `json:"organizationID"`
 	Role           string `json:"role"`
+}
+
+type UpdateHackathonEvent struct {
+	Hackathon HackathonType `json:"hackathon"`
+}
+
+type NewHackathonAnnouncementEvent struct {
+	Announcement AnnouncementType `json:"announcement"`
 }

@@ -38,6 +38,9 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[EventSendNotification] = NotificationHandler
 	m.handlers[GetRead] = ReadMessageHandler
 	m.handlers[SendUpdateMembershipEvent] = UpdateMembershipHandler
+	m.handlers[HackathonSetup] = HackathonSetupHandler
+	m.handlers[HackathonUpdateSendEvent] = UpdateHackathonHandler
+	m.handlers[SendHackathonAnnouncement] = NewHackathonAnnouncementHandler
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) error {

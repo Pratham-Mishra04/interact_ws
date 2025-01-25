@@ -233,3 +233,79 @@ func UpdateMembershipHandler(event Event, c *Client) error {
 
 	return nil
 }
+
+func HackathonSetupHandler(event Event, c *Client) error {
+	var setupEvent struct {
+		HackathonID string `json:"hackathonID"`
+	}
+
+	if err := json.Unmarshal(event.Payload, &setupEvent); err != nil {
+		return fmt.Errorf("bad payload in hackathon setup handler :%v", err)
+	}
+
+	c.hackathonID = setupEvent.HackathonID
+
+	return nil
+}
+
+func UpdateHackathonHandler(event Event, c *Client) error {
+	var updateHackathonEvent UpdateHackathonEvent
+
+	if err := json.Unmarshal(event.Payload, &updateHackathonEvent); err != nil {
+		return fmt.Errorf("bad payload in update hackathon :%v", err)
+	}
+
+	var updateHackathon UpdateHackathonEvent
+
+	updateHackathon.Hackathon = updateHackathonEvent.Hackathon
+
+	data, err := json.Marshal(updateHackathon)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshall update hackathon")
+	}
+
+	outgoingEvent := Event{
+		Type:    HackathonUpdateReceiveEvent,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if client.hackathonID == updateHackathon.Hackathon.ID {
+			client.egress <- outgoingEvent
+		}
+	}
+
+	return nil
+}
+
+func NewHackathonAnnouncementHandler(event Event, c *Client) error {
+	var newAnnouncementEvent NewHackathonAnnouncementEvent
+
+	if err := json.Unmarshal(event.Payload, &newAnnouncementEvent); err != nil {
+		return fmt.Errorf("bad payload in update hackathon announcement :%v", err)
+	}
+
+	var newAnnouncement NewHackathonAnnouncementEvent
+
+	newAnnouncement.Announcement = newAnnouncementEvent.Announcement
+
+	data, err := json.Marshal(newAnnouncement)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshall new hackathon announcement")
+	}
+
+	outgoingEvent := Event{
+		Type:    ReceiveHackathonAnnouncement,
+		Payload: data,
+	}
+
+	for client := range c.manager.clients {
+		if client.hackathonID == newAnnouncement.Announcement.HackathonID {
+			client.egress <- outgoingEvent
+		}
+	}
+
+	return nil
+}
